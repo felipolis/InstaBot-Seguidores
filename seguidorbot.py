@@ -1,12 +1,16 @@
-from selenium import webdriver
+from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
 from time import sleep
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class instagramBot:
-    def __init__(self, username, password):
+    def __init__(self, username, password, hashtag):
         self.username = username
         self.password = password
-        self.driver = webdriver.Firefox(executable_path=r'C:\WebDriver\bin\geckodriver.exe')
+        self.hashtag = hashtag
+        self.driver = Chrome()
+        self.wdw = WebDriverWait(self.driver, 10)
 
     # //input[name="username"]
     # //input[name="password"]
@@ -30,9 +34,10 @@ class instagramBot:
 
         sleep(8)
 
-        self.curtir_fotos('memesbr')
+        self.curtir_fotos(self.hashtag)
 
     def curtir_fotos(self, hashtag):
+        wdw = self.wdw
         driver = self.driver
         driver.get(f'https://www.instagram.com/explore/tags/{hashtag}/')
         sleep(5)
@@ -41,15 +46,16 @@ class instagramBot:
             sleep(3)
         hrefs = driver.find_elements_by_tag_name('a')
         pic_hrefs = [elem.get_attribute('href') for elem in hrefs]
-        # [href for href in pic_hrefs if hashtag in href]
         print(hashtag + ' fotos: ' + str(len(pic_hrefs)))
 
         for pic_href in pic_hrefs:
             driver.get(pic_href)
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+            sleep(5)
+
             try:
                 driver.find_element_by_css_selector('button [aria-label="Curtir"]').click()
-                sleep(19)
+                sleep(15)
             except Exception as e:
                 print(e)
                 sleep(5)
@@ -57,5 +63,6 @@ class instagramBot:
 
 user = str(input("Digite o nome de usuario: "))
 passw = str(input("Digite a sua senha: "))
-archanjoBot = instagramBot(user, passw)
+hash = str(input("Digite uma hashtag [sem a #]: "))
+archanjoBot = instagramBot(user, passw, hash)
 archanjoBot.login()
